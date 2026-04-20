@@ -1,0 +1,128 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #131317;
+  --color-surface: rgba(19, 19, 23, 0.9);
+  --color-surface-lowest: #0e0e12;
+  --color-surface-low: #1b1b1f;
+  --color-surface-high: #2a292e;
+  --color-surface-highest: #353439;
+  --color-outline: rgba(152, 141, 159, 0.18);
+  --color-outline-strong: rgba(152, 141, 159, 0.4);
+  --color-text: #e4e1e7;
+  --color-text-muted: #a1a1aa;
+  --color-primary: #ddb8ff;
+  --color-primary-strong: #7f2ccb;
+  --color-success: #22c55e;
+  --color-danger: #ef4444;
+
+  --font-manrope: "Manrope", sans-serif;
+  --font-jakarta: "Plus Jakarta Sans", sans-serif;
+
+  --shadow-main: 0 24px 48px rgba(0, 0, 0, 0.32);
+  --shadow-soft: 0 12px 32px rgba(127, 44, 203, 0.14);
+
+  @keyframes pulse-ring {
+    0% {
+      transform: scale(0.92);
+      opacity: 0.4;
+    }
+    70% {
+      transform: scale(1.18);
+      opacity: 0;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes page-fade {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes typing-bounce {
+    0%, 80%, 100% {
+      transform: translateY(0);
+      opacity: 0.45;
+    }
+    40% {
+      transform: translateY(-4px);
+      opacity: 1;
+    }
+  }
+}
+
+@layer base {
+  * {
+    @apply box-border;
+  }
+
+  html,
+  body,
+  #app {
+    @apply min-h-full;
+  }
+
+  body {
+    @apply m-0 bg-background text-text font-manrope antialiased;
+    background:
+      radial-gradient(
+        circle at top left,
+        rgba(127, 44, 203, 0.08),
+        transparent 35%
+      ),
+      radial-gradient(
+        circle at bottom right,
+        rgba(127, 44, 203, 0.06),
+        transparent 40%
+      ),
+      #131317;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+
+  button,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  a {
+    @apply text-inherit no-underline;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-jakarta font-extrabold tracking-tight;
+  }
+
+  /* Global scrollbar styling */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  .scrollbar-thumb-surface-highest::-webkit-scrollbar-thumb {
+    background: #353439;
+    border-radius: 999px;
+  }
+}
+
+@layer utilities {
+  .material-symbols-outlined {
+    font-variation-settings:
+      "FILL" 0,
+      "wght" 500,
+      "GRAD" 0,
+      "opsz" 24;
+  }
+}
