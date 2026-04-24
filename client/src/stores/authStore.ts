@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { toast } from 'sonner';
-import { login as loginService, register as registerService } from '../services/authService';
+import { loginGoogle, login as loginService, register as registerService } from '../services/authService';
 import { getMe } from '../services/userService';
 import type { AuthStatus, LoginRequest, RegisterRequest, User } from '../types';
 
@@ -11,7 +11,6 @@ type AuthSession = {
 };
 
 type AuthStore = AuthSession & {
-  authError: string | null;
   fetchCurrentUser: () => Promise<User>;
   isAuthenticated: boolean;
   loginWithCredentials: (payload: LoginRequest) => Promise<void>;
@@ -29,7 +28,7 @@ export const useAuthStore = create<AuthStore>()(
       authError: null,
       currentUser: null,
       isAuthenticated: false,
-      clearAuthError: () => set({ authError: null, status: 'idle' }),
+      clearAuthError: () => set({ status: 'idle' }),
       fetchCurrentUser: async () => {
         const currentUser = await getMe();
         set({
@@ -40,14 +39,13 @@ export const useAuthStore = create<AuthStore>()(
         return currentUser;
       },
       loginWithCredentials: async (payload) => {
-        set({ authError: null, status: 'loading' });
+        set({ status: 'loading' });
 
         try {
           await loginService(payload);
           const currentUser = await getMe();
           set({
             alias: currentUser?.name,
-            authError: null,
             currentUser,
             isAuthenticated: true,
             status: 'authenticated',
@@ -57,7 +55,6 @@ export const useAuthStore = create<AuthStore>()(
           const message = error instanceof Error ? error.message : 'Không thể đăng nhập lúc này.';
           set({
             alias: null,
-            authError: message,
             currentUser: null,
             isAuthenticated: false,
             status: 'error',
@@ -67,12 +64,11 @@ export const useAuthStore = create<AuthStore>()(
         }
       },
       registerWithCredentials: async (payload) => {
-        set({ authError: null, status: 'loading' });
+        set({ status: 'loading' });
 
         try {
           await registerService(payload);
           set({
-            authError: null,
             status: 'idle',
           });
           toast.success('Đăng ký thành công!');
@@ -89,16 +85,39 @@ export const useAuthStore = create<AuthStore>()(
       login: (alias) =>
         set({
           alias: alias ?? null,
-          authError: null,
           currentUser: null,
           isAuthenticated: true,
           status: 'authenticated',
         }),
+      loginWithGoogle: async () => {
+        set({ status: 'loading' });
+
+        try {
+          await loginGoogle();
+          const currentUser = await getMe();
+          set({
+            alias: currentUser?.name,
+            currentUser,
+            isAuthenticated: true,
+            status: 'authenticated',
+          });
+          toast.success('Đăng nhập thành công!');
+        } catch (error) {
+          const message = error instanceof Error ? error.message : 'Không thể đăng nhập lúc này.';
+          set({
+            alias: null,
+            currentUser: null,
+            isAuthenticated: false,
+            status: 'error',
+          });
+          toast.error(message);
+          throw error;
+        }
+      },
 
       logout: () =>
         set({
           alias: null,
-          authError: null,
           currentUser: null,
           isAuthenticated: false,
           status: 'idle',

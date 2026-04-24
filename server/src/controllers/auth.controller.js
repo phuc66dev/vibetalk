@@ -18,18 +18,13 @@ const AppError = require("../utils/AppError");
 const oauth2Login = async (req, res, next) => {
   const user = req.user;
   try {
-    const token = await generateAccessToken(user._id);
-    await generateRefreshToken(user._id, res);
+    // Set access_token cookie (httpOnly, không cần CORS vì đây là server-side redirect)
+    await generateAccessToken(res, user._id);
 
-    const data = {
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      avatar: user.avatar,
-      accessToken: token,
-    };
-    responseSuccess(res, "Login successfully", data, 200);
-  } catch (error) {
+    // Redirect về frontend — browser tự mang cookie theo
+    // KHÔNG dùng res.json() vì đây là browser redirect, không phải AJAX
+    res.redirect(`${process.env.FRONTEND_ORIGIN}`);
+  } catch (err) {
     next(err);
   }
 };

@@ -1,29 +1,53 @@
-import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Field from '../components/ui/Field';
 import { useAuthStore } from '../stores/authStore';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+
+const RegisterSchema = z.object({
+  name: z.string().min(1, 'Name is required')
+    .min(2, 'Name must be at least 2 characters').
+    max(50, 'Name is too long')
+    .regex(/^[a-zA-Z0-9\s]+$/, 'Name contains invalid characters (only letters, numbers, and spaces allowed)'),
+  email: z.string()
+    .min(1, 'Email is required')
+    .email('Invalid email format')
+    .max(255, 'Email is too long'),
+  password: z.string()
+    .min(1, 'Password is required')
+    .min(6, 'Password must be at least 6 characters')
+    .max(50, 'Password is too long'),
+});
+
+type RegisterFormValues = z.infer<typeof RegisterSchema>;
 
 function RegisterPage() {
-  const [name, setName] = useState('GhostWalker');
-  const [email, setEmail] = useState('you@anonymous.com');
-  const [password, setPassword] = useState('private-channel');
-  const [confirmPassword, setConfirmPassword] = useState('private-channel');
 
   const navigate = useNavigate();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<RegisterFormValues>({
+    resolver: zodResolver(RegisterSchema),
+    defaultValues: { name: '', email: '', password: '' },
+  });
 
   const registerWithCredentials = useAuthStore(
     (state) => state.registerWithCredentials,
   );
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    if (password !== confirmPassword) {
-      return;
+  async function onSubmit(data: RegisterFormValues) {
+    try {
+      await registerWithCredentials(data);
+      navigate('/login', { replace: true });
+    } catch {
+      // lỗi được xử lý trong store (toast)
     }
-
-    await registerWithCredentials({ name, email, password });
-    navigate('/login', { replace: true });
   }
 
   return (
@@ -35,28 +59,59 @@ function RegisterPage() {
         </div>
 
         <div className="relative rounded-3xl border border-outline bg-[#1f1f23]/88 p-8 shadow-main">
-          <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-            <Field icon="person" label="Anonymous Name" onChange={setName} value={name} />
-            <Field icon="alternate_email" label="Email" onChange={setEmail} type="email" value={email} />
-            <Field icon="lock" label="Secret Key" onChange={setPassword} type="password" value={password} />
-            <div className="relative flex items-center gap-[0.75rem] text-[0.72rem] font-extrabold uppercase text-primary before:h-2 before:flex-1 before:rounded-full before:bg-[#0e0e12]/90 before:content-['']">
-              <div className="absolute left-0 h-2 w-[60%] rounded-full bg-gradient-to-br from-primary to-primary-strong" />
-              <span className="relative">Secure</span>
+          <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
+            {/* Name */}
+            <div className="flex flex-col gap-[0.55rem]">
+              <Label className="uppercase">Your name</Label>
+              <Input
+                id="name"
+                type="text"
+                placeholder="Type your name"
+                aria-invalid={!!errors.name}
+                {...register('name')}
+              />
+              {errors.name && (
+                <p className="text-xs text-danger">{errors.name?.message}</p>
+              )}
             </div>
-            <Field
-              icon="verified_user"
-              label="Confirm Key"
-              onChange={setConfirmPassword}
-              type="password"
-              value={confirmPassword}
-            />
-
-            <button
-              className="inline-flex min-h-[3.5rem] items-center justify-center gap-[0.6rem] rounded-2xl bg-gradient-to-br from-primary to-primary-strong px-[1.2rem] py-[0.95rem] font-extrabold text-[#2c0051] shadow-[0_14px_32px_rgba(127,44,203,0.24)] transition-all duration-160 hover:-translate-y-px active:scale-[0.98]"
+            {/* Email */}
+            <div className="flex flex-col gap-[0.55rem]">
+              <Label className="uppercase">Email Address</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="Type your email address"
+                aria-invalid={!!errors.email}
+                {...register('email')}
+              />
+              {errors.email && (
+                <p className="text-xs text-danger">{errors.email?.message}</p>
+              )}
+            </div>
+            {/* Password */}
+            <div className="flex flex-col gap-[0.55rem]">
+              <Label className="uppercase">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Type your password"
+                aria-invalid={!!errors.password}
+                {...register('password')}
+              />
+              {errors.password && (
+                <p className="text-xs text-danger">{errors.password?.message}</p>
+              )}
+            </div>
+            {/* Button register */}
+            <Button
+              className="w-full mt-1 text-lg"
+              disabled={isSubmitting}
+              size="lg"
               type="submit"
+              variant="auth"
             >
-              Register Identity
-            </button>
+              {isSubmitting ? 'Submiting...' : 'Register Identity'}
+            </Button>
           </form>
         </div>
 

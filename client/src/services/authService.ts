@@ -19,13 +19,16 @@ function deriveAlias(response: RawLoginResponse, email: string) {
   );
 }
 
+export async function loginGoogle(): Promise<void> {
+  await apiClient.get("/auth/google");
+}
+
+
 export async function login(credentials: LoginRequest): Promise<LoginResponse> {
   const response = await apiClient.post<RawLoginResponse>(
     "/auth/login",
     credentials,
   );
-
-  console.log(deriveAlias(response, credentials.email))
 
   return {
     alias: deriveAlias(response, credentials.email),

@@ -1,27 +1,73 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import Field from '../components/ui/Field';
-import { Button } from '../components/ui/Button';
+import { useEffect } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { toast } from 'sonner';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useAuthStore } from '../stores/authStore';
 
+/* ── Validation schema ─────────────────────────────────────────── */
+const LoginSchema = z.object({
+  email: z.string().min(1, 'Email is required').email('Invalid email format').max(255, 'Email is too long'),
+  password: z.string().min(1, 'Password is required').min(6, 'Password must be at least 6 characters').max(50, 'Password is too long'),
+});
+
+type LoginFormValues = z.infer<typeof LoginSchema>;
+
+/* ── Component ─────────────────────────────────────────────────── */
 function LoginPage() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const clearAuthError = useAuthStore((state) => state.clearAuthError);
   const loginWithCredentials = useAuthStore((state) => state.loginWithCredentials);
   const status = useAuthStore((state) => state.status);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+
+  // Lắng nghe lỗi từ URL (ví dụ chuyển hướng thất bại từ OAuth2)
+  useEffect(() => {
+    const error = searchParams.get('error');
+    if (error) {
+      if (error === 'oauth_failed') {
+        toast.error('Đăng nhập bằng Google thất bại. Vui lòng thử lại.');
+      } else {
+        toast.error('Có lỗi xảy ra trong quá trình đăng nhập.');
+      }
+
+      // Xoá tham số error ra khỏi URL để tránh báo lỗi lại lúc chuyển trang
+      searchParams.delete('error');
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   const isLoading = status === 'loading';
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(LoginSchema),
+    defaultValues: { email: '', password: '' },
+  });
+
+  // RHF handleSubmit validate xong → gọi onSubmit với data đã validated
+  async function onSubmit(data: LoginFormValues) {
+    clearAuthError();
     try {
-      await loginWithCredentials({ email, password });
+      await loginWithCredentials(data);
       navigate('/', { replace: true });
     } catch {
-      // lỗi đã được xử lý trong store (toast + authError state)
+      // lỗi được xử lý trong store (toast)
     }
+  }
+
+  // Redirect trình duyệt trực tiếp — KHÔNG dùng fetch/axios cho OAuth
+  // Google redirect lại server → server set cookie → redirect về /auth/callback
+  function handleLoginWithGoogle() {
+    window.location.href = 'http://localhost:8000/api/auth/google';
   }
 
   return (
@@ -47,32 +93,45 @@ function LoginPage() {
             <p className="text-text-muted">Sign in to rejoin the confessional.</p>
           </header>
 
-          <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-            <Field
-              icon="email"
-              label="Email Address"
-              onChange={(value) => { clearAuthError(); setEmail(value); }}
-              placeholder="Type your email address"
-              type="email"
-              value={email}
-            />
-            <Field
-              icon="lock"
-              label="Password"
-              onChange={(value) => { clearAuthError(); setPassword(value); }}
-              placeholder="Type your password"
-              type="password"
-              value={password}
-            />
+          {/* handleSubmit(onSubmit) — RHF tự preventDefault và validate */}
+          <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
 
-            {/* Nút submit – dùng Button component */}
+            {/* Email */}
+            <div className="flex flex-col gap-[0.55rem]">
+              <Label className="uppercase">Email Address</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="Type your email address"
+                aria-invalid={!!errors.email}
+                {...register('email')}
+              />
+              {errors.email && (
+                <p className="text-xs text-danger">{errors.email?.message}</p>
+              )}
+            </div>
+
+            {/* Password */}
+            <div className="flex flex-col gap-[0.55rem]">
+              <Label className="uppercase">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Type your password"
+                aria-invalid={!!errors.password}
+                {...register('password')}
+              />
+              {errors.password && (
+                <p className="text-xs text-danger">{errors.password?.message}</p>
+              )}
+            </div>
+
             <Button
-              className="w-full mt-1"
+              className="w-full mt-1 text-lg"
               disabled={isLoading}
-              loading={isLoading}
               size="lg"
               type="submit"
-              variant="default"
+              variant="auth"
             >
               {isLoading ? 'Logging in...' : 'Log In'}
             </Button>
@@ -83,9 +142,9 @@ function LoginPage() {
             <span className="relative z-[1] bg-[#1f1f23]/98 px-3">Or continue with</span>
           </div>
 
-          {/* OAuth buttons – dùng Button variant="secondary" */}
+          {/* OAuth buttons */}
           <div className="grid grid-cols-2 gap-4">
-            <Button size="lg" type="button" variant="secondary">
+            <Button onClick={handleLoginWithGoogle} size="lg" type="button" variant="secondary">
               <span className="material-symbols-outlined">language</span>
               Google
             </Button>

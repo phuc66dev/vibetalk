@@ -1,106 +1,65 @@
-import * as React from 'react';
-import { Slot } from '@radix-ui/react-slot';
-import { cva, type VariantProps } from 'class-variance-authority';
-import { cn } from '../../lib/utils';
+import * as React from "react"
+import { cva, type VariantProps } from "class-variance-authority"
+import { Slot } from "radix-ui"
 
-/**
- * Button component – shadcn/ui style, tích hợp với design system VibeTalk.
- *
- * Variants:
- *  - default   : gradient primary (tím)
- *  - secondary : nền tối, viền mờ
- *  - ghost     : trong suốt, no border
- *  - danger    : đỏ – dùng cho hành động nguy hiểm
- *  - outline   : viền primary
- *
- * Sizes:
- *  - sm   : nhỏ
- *  - md   : mặc định
- *  - lg   : lớn
- *  - icon : vuông (nút icon)
- */
+import { cn } from "@/lib/utils"
+
 const buttonVariants = cva(
-  // Base styles
-  [
-    'inline-flex items-center justify-center gap-2',
-    'rounded-2xl font-extrabold transition-all duration-160',
-    'disabled:cursor-not-allowed disabled:opacity-60 disabled:saturate-75',
-    'hover:-translate-y-px active:scale-[0.98]',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60',
-    'cursor-pointer select-none',
-  ],
+  "inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 cursor-pointer",
   {
     variants: {
       variant: {
-        default: [
-          'bg-gradient-to-br from-primary to-primary-strong',
-          'text-[#2c0051]',
-          'shadow-[0_14px_32px_rgba(127,44,203,0.24)]',
-        ],
-        secondary: [
-          'bg-[#1b1b1f]/92 border border-outline/18',
-          'text-text',
-        ],
-        ghost: [
-          'bg-transparent text-text-muted',
-          'hover:bg-surface-highest/28 hover:text-text',
-        ],
-        danger: [
-          'bg-danger/12 text-[#fecaca]',
-          'hover:bg-danger/20',
-        ],
-        outline: [
-          'border border-primary/40 bg-transparent',
-          'text-primary hover:bg-primary/8',
-        ],
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        destructive:
+          "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:bg-destructive/60 dark:focus-visible:ring-destructive/40",
+        outline:
+          "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
+        secondary:
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        ghost:
+          "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
+        link: "text-primary underline-offset-4 hover:underline",
+        auth: "w-full mt-1 py-6 bg-gradient-to-br from-primary to-primary-strong text-text-auth font-bold",
       },
       size: {
-        sm:   'min-h-[2.25rem] px-3 py-[0.4rem] text-[0.82rem]',
-        md:   'min-h-[3rem] px-[1.1rem] py-[0.75rem] text-[0.95rem]',
-        lg:   'min-h-[3.5rem] px-[1.2rem] py-[0.95rem] text-[1.05rem]',
-        icon: 'h-12 w-12 rounded-full p-0',
+        default: "h-9 px-4 py-2 has-[>svg]:px-3",
+        xs: "h-6 gap-1 rounded-md px-2 text-xs has-[>svg]:px-1.5 [&_svg:not([class*='size-'])]:size-3",
+        sm: "h-8 gap-1.5 rounded-md px-3 has-[>svg]:px-2.5",
+        lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
+        icon: "size-9",
+        "icon-xs": "size-6 rounded-md [&_svg:not([class*='size-'])]:size-3",
+        "icon-sm": "size-8",
+        "icon-lg": "size-10",
       },
     },
     defaultVariants: {
-      variant: 'default',
-      size: 'lg',
+      variant: "default",
+      size: "default",
     },
-  },
-);
+  }
+)
 
-export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
-  /** Nếu true, render con slot (e.g. <Link> làm button) */
-  asChild?: boolean;
-  /** Hiển thị vòng loading khi true */
-  loading?: boolean;
+function Button({
+  className,
+  variant = "default",
+  size = "default",
+  asChild = false,
+  ...props
+}: React.ComponentProps<"button"> &
+  VariantProps<typeof buttonVariants> & {
+    asChild?: boolean
+  }) {
+  const Comp = asChild ? Slot.Root : "button"
+
+  return (
+    <Comp
+      data-slot="button"
+      data-variant={variant}
+      data-size={size}
+      className={cn(buttonVariants({ variant, size, className }))}
+      {...props}
+    />
+  )
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, loading = false, children, disabled, ...props }, ref) => {
-    const Comp = asChild ? Slot : 'button';
-
-    return (
-      <Comp
-        className={cn(buttonVariants({ variant, size }), className)}
-        disabled={disabled || loading}
-        ref={ref}
-        {...props}
-      >
-        {loading ? (
-          <>
-            <span className="h-[1em] w-[1em] rounded-full border-2 border-current border-t-transparent animate-spin" />
-            {children}
-          </>
-        ) : (
-          children
-        )}
-      </Comp>
-    );
-  },
-);
-
-Button.displayName = 'Button';
-
-export { Button, buttonVariants };
+export { Button, buttonVariants }

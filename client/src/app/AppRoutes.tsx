@@ -11,6 +11,7 @@ import DisconnectedPage from '../pages/DisconnectedPage';
 import ProfilePage from '../pages/ProfilePage';
 import EditProfilePage from '../pages/EditProfilePage';
 import SettingsPage from '../pages/SettingsPage';
+import Page404 from '../pages/404';
 import { useAuthStore } from '../stores/authStore';
 
 function AppRoutes() {
@@ -45,7 +46,7 @@ function AppRoutes() {
       {/* ── Fallback ──────────────────────────────────────────────────── */}
       <Route
         path="*"
-        element={<Navigate replace to={isAuthenticated ? '/' : '/login'} />}
+        element={<Page404 />}
       />
     </Routes>
   );

@@ -14,6 +14,12 @@
     "moduleDetection": "force",
     "noEmit": true,
 
+    /* Import alias – dùng bởi shadcn/ui */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+
     /* Linting */
     "noUnusedLocals": true,
     "noUnusedParameters": true,

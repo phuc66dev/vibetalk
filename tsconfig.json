@@ -1,0 +1,8 @@
+{
+  // Root tsconfig – chỉ dùng để IDE nhận diện monorepo structure.
+  // Build thực tế dùng client/tsconfig.json và server không cần tsconfig.
+  "files": [],
+  "references": [
+    { "path": "./client" }
+  ]
+}

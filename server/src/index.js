@@ -26,10 +26,15 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   session({
-    secret: "keyboard cat",
+    secret: process.env.SESSION_SECRET || "keyboard cat",
     resave: false,
-    saveUninitialized: true,
-    cookie: { secure: true },
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV !== "development", // false trên localhost
+      httpOnly: true,
+      sameSite: "lax", // lax để Google redirect hoạt động (strict chặn redirect)
+      maxAge: 10 * 60 * 1000, // 10 phút (chỉ dùng trong OAuth flow)
+    },
   }),
 );
 /* OAuth Middleware */
