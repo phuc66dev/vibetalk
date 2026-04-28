@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { FaGithub, FaGoogle } from 'react-icons/fa';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -85,6 +86,9 @@ function LoginPage() {
   function handleLoginWithGoogle() {
     window.location.href = 'http://localhost:8000/api/auth/google';
   }
+  function handleLoginWithGithub() {
+    window.location.href = 'http://localhost:8000/api/auth/github';
+  }
 
   return (
     <main className="relative z-[1] flex min-h-screen items-center justify-center px-6 py-8">
@@ -161,12 +165,12 @@ function LoginPage() {
           {/* OAuth buttons */}
           <div className="grid grid-cols-2 gap-4">
             <Button onClick={handleLoginWithGoogle} size="lg" type="button" variant="secondary">
-              <span className="material-symbols-outlined">language</span>
+              <FaGoogle className="w-5 h-5" />
               Google
             </Button>
-            <Button size="lg" type="button" variant="secondary">
-              <span className="material-symbols-outlined">devices</span>
-              Apple
+            <Button onClick={handleLoginWithGithub} size="lg" type="button" variant="secondary">
+              <FaGithub className="w-5 h-5" />
+              Github
             </Button>
           </div>
         </div>

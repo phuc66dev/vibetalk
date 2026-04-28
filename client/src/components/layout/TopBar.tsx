@@ -1,5 +1,6 @@
 import { Link, NavLink } from "react-router-dom";
-
+import { FaUser, FaHome } from 'react-icons/fa';
+import { IoMdSettings } from "react-icons/io";
 type TopBarProps = {
   backTo?: string;
   chatMode?: boolean;
@@ -51,42 +52,41 @@ function TopBar({
         >
           <NavLink
             className={({ isActive }) =>
-              `inline-flex items-center justify-center gap-[0.45rem] min-h-[2.75rem] px-4 py-3 rounded-full text-[0.88rem] font-bold transition-all duration-160 hover:text-text hover:-translate-y-[1px] ${
-                isActive
-                  ? "bg-gradient-to-br from-primary/26 to-primary-strong/85 text-text"
-                  : "text-text-muted"
+              `inline-flex items-center justify-center gap-[0.45rem] min-h-[2.75rem] px-4 py-3 rounded-full text-[0.88rem] font-bold transition-all duration-160 hover:text-text hover:-translate-y-[1px] ${isActive
+                ? "bg-gradient-to-br from-primary/26 to-primary-strong/85 text-text"
+                : "text-text-muted"
               }`
             }
             to="/"
             end
           >
-            <span className="material-symbols-outlined">home</span>
+            {/* <span className="material-symbols-outlined">home</span>
+            <span>Home</span> */}
+            <FaHome className="w-5 h-5" />
             <span>Home</span>
           </NavLink>
           <NavLink
             className={({ isActive }) =>
-              `inline-flex items-center justify-center gap-[0.45rem] min-h-[2.75rem] px-4 py-3 rounded-full text-[0.88rem] font-bold transition-all duration-160 hover:text-text hover:-translate-y-[1px] ${
-                isActive
-                  ? "bg-gradient-to-br from-primary/26 to-primary-strong/85 text-text"
-                  : "text-text-muted"
+              `inline-flex items-center justify-center gap-[0.45rem] min-h-[2.75rem] px-4 py-3 rounded-full text-[0.88rem] font-bold transition-all duration-160 hover:text-text hover:-translate-y-[1px] ${isActive
+                ? "bg-gradient-to-br from-primary/26 to-primary-strong/85 text-text"
+                : "text-text-muted"
               }`
             }
             to="/profile"
           >
-            <span className="material-symbols-outlined">person</span>
+            <FaUser className="w-5 h-5" />
             <span>Profile</span>
           </NavLink>
           <NavLink
             className={({ isActive }) =>
-              `inline-flex items-center justify-center gap-[0.45rem] min-h-[2.75rem] px-4 py-3 rounded-full text-[0.88rem] font-bold transition-all duration-160 hover:text-text hover:-translate-y-[1px] ${
-                isActive
-                  ? "bg-gradient-to-br from-primary/26 to-primary-strong/85 text-text"
-                  : "text-text-muted"
+              `inline-flex items-center justify-center gap-[0.45rem] min-h-[2.75rem] px-4 py-3 rounded-full text-[0.88rem] font-bold transition-all duration-160 hover:text-text hover:-translate-y-[1px] ${isActive
+                ? "bg-gradient-to-br from-primary/26 to-primary-strong/85 text-text"
+                : "text-text-muted"
               }`
             }
             to="/settings"
           >
-            <span className="material-symbols-outlined">settings</span>
+            <IoMdSettings className="w-5 h-5" />
             <span>Settings</span>
           </NavLink>
         </nav>

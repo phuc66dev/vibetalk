@@ -21,7 +21,7 @@ const oauth2Login = async (req, res, next) => {
     // Set access_token cookie (httpOnly, không cần CORS vì đây là server-side redirect)
     await generateAccessToken(res, user._id);
 
-    console.log("Đăng nhập google thành công rồi á!!!")
+    console.log("Đăng nhập github thành công rồi á!!!: ", user)
 
     // Redirect về frontend — browser tự mang cookie theo
     // KHÔNG dùng res.json() vì đây là browser redirect, không phải AJAX
