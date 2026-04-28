@@ -18,6 +18,7 @@ const UserSchema = new mongoose.Schema(
 
     // ── OAuth ─────────────────────────────────────────────────────────────
     googleId: { type: String, sparse: true },
+    githubId: { type: String, sparse: true },
 
     // ── Sở thích (dùng để matching) ───────────────────────────────────────
     interests: [{ type: String, lowercase: true, trim: true }], // VD: ["gaming", "music", "travel"]

@@ -40,3 +40,6 @@ export async function register(credentials: RegisterRequest): Promise<void> {
   console.log(res);
 }
 
+export async function logout(): Promise<void> {
+  await apiClient.post("/auth/logout");
+}

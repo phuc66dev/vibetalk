@@ -1,9 +1,13 @@
 import ToggleRow from '../components/ui/ToggleRow';
 import { useAppContext } from '../components/layout/AppLayout';
+import { useAuthStore } from '@/stores/authStore';
 
 function SettingsPage() {
   const app = useAppContext();
-  const { blockedUsers, logout, settings, toggleSetting, unblockUser } = app;
+  const { blockedUsers, settings, toggleSetting, unblockUser } = app;
+
+  const logout = useAuthStore((state) => state.logout)
+
 
   return (
     <main className="relative z-[1] min-h-screen px-6 pb-[7.5rem] pt-[6rem] animate-[page-fade_320ms_ease-out]">
