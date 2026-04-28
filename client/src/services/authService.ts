@@ -1,5 +1,5 @@
 import { apiClient } from "./apiClient";
-import type { LoginRequest, LoginResponse, RegisterRequest } from "../types";
+import type { LoginRequest, LoginResponse, RegisterRequest, ResetPasswordRequest } from "../types";
 
 type RawLoginResponse = {
   alias?: string;
@@ -43,3 +43,12 @@ export async function register(credentials: RegisterRequest): Promise<void> {
 export async function logout(): Promise<void> {
   await apiClient.post("/auth/logout");
 }
+
+export async function forgotPassword(email: string): Promise<void> {
+  await apiClient.post("/auth/forgot-password", { email });
+}
+
+export async function resetPassword(payload: ResetPasswordRequest): Promise<void> {
+  await apiClient.post(`/auth/reset-password?token=${payload.token}`, { resetPassword: payload.newPassword });
+}
+

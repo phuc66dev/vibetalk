@@ -1,9 +1,9 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { toast } from 'sonner';
-import { logout, loginGoogle, login as loginService, register as registerService } from '../services/authService';
+import { resetPassword as resetPasswordService, forgotPassword as forgotPasswordService, logout, loginGoogle, login as loginService, register as registerService } from '../services/authService';
 import { getMe } from '../services/userService';
-import type { AuthStatus, LoginRequest, RegisterRequest, User } from '../types';
+import type { AuthStatus, LoginRequest, RegisterRequest, User, ResetPasswordRequest } from '../types';
 
 type AuthSession = {
   alias: string | null;
@@ -18,6 +18,8 @@ type AuthStore = AuthSession & {
   clearAuthError: () => void;
   login: (alias?: string) => void;
   logout: () => void;
+  forgotPassword: (payload: string) => void;
+  resetPassword: (payload: ResetPasswordRequest) => void;
   status: AuthStatus;
 };
 
@@ -124,7 +126,28 @@ export const useAuthStore = create<AuthStore>()(
         });
         await logout();
         toast.success('Đăng xuất thành công!');
-      }
+      },
+
+      forgotPassword: async (payload) => {
+        try {
+          await forgotPasswordService(payload);
+          toast.success('Recovery code sent to your email!');
+        } catch (error) {
+          const message = error instanceof Error ? error.message : 'Cannot send password reset request.';
+          toast.error(message);
+          throw error;
+        }
+      },
+      resetPassword: async (payload) => {
+        try {
+          await resetPasswordService(payload);
+          toast.success('Password reset successfully! Login again!');
+        } catch (error) {
+          const message = error instanceof Error ? error.message : 'Cannot reset password.';
+          toast.error(message);
+          throw error;
+        }
+      },
     }),
     {
       name: 'stranger-auth',

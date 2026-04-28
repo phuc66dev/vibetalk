@@ -15,3 +15,8 @@ export type RegisterRequest = {
   password: string;
   avatar?: string;
 };
+
+export type ResetPasswordRequest = {
+  token: string;
+  newPassword: string;
+};

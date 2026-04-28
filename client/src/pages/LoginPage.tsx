@@ -146,6 +146,10 @@ function LoginPage() {
               )}
             </div>
 
+            <div className="flex flex-col gap-[0.55rem]">
+              <Link to='/forgot-password' className='text-right text-text-muted transition-all hover:text-text'>Forgot password?</Link>
+            </div>
+
             <Button
               className="w-full mt-1 text-lg"
               disabled={isLoading}

@@ -5,6 +5,7 @@ import ProtectedRoute from '../components/layout/ProtectedRoute';
 
 import LoginPage from '../pages/LoginPage';
 import RegisterPage from '../pages/RegisterPage';
+import ForgotPasswordPage from '../pages/ForgotPasswordPage';
 import HomePage from '../pages/HomePage';
 import ChatPage from '../pages/ChatPage';
 import DisconnectedPage from '../pages/DisconnectedPage';
@@ -28,6 +29,10 @@ function AppRoutes() {
         <Route
           path="/register"
           element={isAuthenticated ? <Navigate replace to="/" /> : <RegisterPage />}
+        />
+        <Route
+          path="/forgot-password"
+          element={isAuthenticated ? <Navigate replace to="/" /> : <ForgotPasswordPage />}
         />
       </Route>
 

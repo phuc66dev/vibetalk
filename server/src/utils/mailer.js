@@ -7,10 +7,13 @@ const transporter = nodemailer.createTransport({
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
+  tls: {
+    rejectUnauthorized: false
+  }
 });
 
 const sendResetPasswordEmail = async (to, token) => {
-  const resetUrl = `http://localhost:5000/api/auth/reset-password?token=${token}`;
+  const resetUrl = `http://localhost:5173/forgot-password?token=${token}`;
 
   await transporter.sendMail({
     from: `"Support" <${process.env.EMAIL_USER}>`,

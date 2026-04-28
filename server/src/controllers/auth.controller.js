@@ -194,7 +194,7 @@ const forgotPassword = async (req, res, next) => {
     const user = await userService.findByEmail(email);
     if (!user) return next(AppError.template(ERROR_CODE.NOT_FOUND));
 
-    const tokenReset = generateAccessToken(user._id);
+    const tokenReset = generateAccessToken(res, user._id);
 
     await sendResetPasswordEmail(email, tokenReset);
 
