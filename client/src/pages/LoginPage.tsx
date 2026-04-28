@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { FaGithub, FaGoogle } from 'react-icons/fa';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,23 +25,39 @@ function LoginPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const clearAuthError = useAuthStore((state) => state.clearAuthError);
   const loginWithCredentials = useAuthStore((state) => state.loginWithCredentials);
+  const fetchCurrentUser = useAuthStore((state) => state.fetchCurrentUser);
   const status = useAuthStore((state) => state.status);
 
-  // Lắng nghe lỗi từ URL (ví dụ chuyển hướng thất bại từ OAuth2)
+  // Lắng nghe kết quả từ OAuth2 (thành công hoặc thất bại)
   useEffect(() => {
     const error = searchParams.get('error');
+    const oauthSuccess = searchParams.get('oauth_success');
+
     if (error) {
       if (error === 'oauth_failed') {
         toast.error('Đăng nhập bằng Google thất bại. Vui lòng thử lại.');
       } else {
         toast.error('Có lỗi xảy ra trong quá trình đăng nhập.');
       }
-
-      // Xoá tham số error ra khỏi URL để tránh báo lỗi lại lúc chuyển trang
       searchParams.delete('error');
       setSearchParams(searchParams, { replace: true });
+    } else if (oauthSuccess) {
+      const handleOauthSuccess = async () => {
+        try {
+          // Lấy thông tin user hiện tại (đã có cookie từ server)
+          await fetchCurrentUser();
+          // Chuyển hướng về trang chủ thay vì ở lại \login
+          navigate('/', { replace: true });
+        } catch (err) {
+          toast.error('Không thể lấy thông tin đăng nhập.');
+        }
+      };
+
+      searchParams.delete('oauth_success');
+      setSearchParams(searchParams, { replace: true });
+      handleOauthSuccess();
     }
-  }, [searchParams, setSearchParams]);
+  }, [searchParams, setSearchParams, fetchCurrentUser, navigate]);
 
   const isLoading = status === 'loading';
 
@@ -68,6 +85,9 @@ function LoginPage() {
   // Google redirect lại server → server set cookie → redirect về /auth/callback
   function handleLoginWithGoogle() {
     window.location.href = 'http://localhost:8000/api/auth/google';
+  }
+  function handleLoginWithGithub() {
+    window.location.href = 'http://localhost:8000/api/auth/github';
   }
 
   return (
@@ -144,13 +164,13 @@ function LoginPage() {
 
           {/* OAuth buttons */}
           <div className="grid grid-cols-2 gap-4">
-            <Button onClick={handleLoginWithGoogle} size="lg" type="button" variant="secondary">
-              <span className="material-symbols-outlined">language</span>
+            <Button onClick={handleLoginWithGoogle} size="lg" type="button" variant="outline" className="hover:bg-primary-strong ">
+              <FaGoogle className="w-5 h-5" />
               Google
             </Button>
-            <Button size="lg" type="button" variant="secondary">
-              <span className="material-symbols-outlined">devices</span>
-              Apple
+            <Button onClick={handleLoginWithGithub} size="lg" type="button" variant="outline" className="hover:bg-primary-strong ">
+              <FaGithub className="w-5 h-5" />
+              Github
             </Button>
           </div>
         </div>

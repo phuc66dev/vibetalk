@@ -34,12 +34,29 @@ router.get(
   })
 );
 
-/* Callback route for OAuth2 authentication */
 // [GET] /api/auth/google/callback
 router.get(
   "/google/callback",
   passport.authenticate("google", {
-    failureRedirect: `${process.env.FRONTEND_ORIGIN}/login`,
+    failureRedirect: `${process.env.FRONTEND_ORIGIN}/login?error=oauth_failed`,
+    session: false,
+  }),
+  oauth2Login
+);
+
+// [GET] /api/auth/github
+router.get(
+  "/github",
+  passport.authenticate("github", {
+    scope: ["user:email"],
+  })
+);
+
+// [GET] /api/auth/github/callback
+router.get(
+  "/github/callback",
+  passport.authenticate("github", {
+    failureRedirect: `${process.env.FRONTEND_ORIGIN}/login?error=oauth_failed`,
     session: false,
   }),
   oauth2Login
