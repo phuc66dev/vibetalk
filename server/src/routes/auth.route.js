@@ -34,12 +34,11 @@ router.get(
   })
 );
 
-/* Callback route for OAuth2 authentication */
 // [GET] /api/auth/google/callback
 router.get(
   "/google/callback",
   passport.authenticate("google", {
-    failureRedirect: `${process.env.FRONTEND_ORIGIN}/login`,
+    failureRedirect: `${process.env.FRONTEND_ORIGIN}/login?error=oauth_failed`,
     session: false,
   }),
   oauth2Login

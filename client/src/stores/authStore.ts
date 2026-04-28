@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { toast } from 'sonner';
-import { loginGoogle, login as loginService, register as registerService } from '../services/authService';
+import { logout, loginGoogle, login as loginService, register as registerService } from '../services/authService';
 import { getMe } from '../services/userService';
 import type { AuthStatus, LoginRequest, RegisterRequest, User } from '../types';
 
@@ -115,13 +115,16 @@ export const useAuthStore = create<AuthStore>()(
         }
       },
 
-      logout: () =>
+      logout: async () => {
         set({
           alias: null,
           currentUser: null,
           isAuthenticated: false,
           status: 'idle',
-        }),
+        });
+        await logout();
+        toast.success('Đăng xuất thành công!');
+      }
     }),
     {
       name: 'stranger-auth',

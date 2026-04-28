@@ -24,23 +24,39 @@ function LoginPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const clearAuthError = useAuthStore((state) => state.clearAuthError);
   const loginWithCredentials = useAuthStore((state) => state.loginWithCredentials);
+  const fetchCurrentUser = useAuthStore((state) => state.fetchCurrentUser);
   const status = useAuthStore((state) => state.status);
 
-  // Lắng nghe lỗi từ URL (ví dụ chuyển hướng thất bại từ OAuth2)
+  // Lắng nghe kết quả từ OAuth2 (thành công hoặc thất bại)
   useEffect(() => {
     const error = searchParams.get('error');
+    const oauthSuccess = searchParams.get('oauth_success');
+
     if (error) {
       if (error === 'oauth_failed') {
         toast.error('Đăng nhập bằng Google thất bại. Vui lòng thử lại.');
       } else {
         toast.error('Có lỗi xảy ra trong quá trình đăng nhập.');
       }
-
-      // Xoá tham số error ra khỏi URL để tránh báo lỗi lại lúc chuyển trang
       searchParams.delete('error');
       setSearchParams(searchParams, { replace: true });
+    } else if (oauthSuccess) {
+      const handleOauthSuccess = async () => {
+        try {
+          // Lấy thông tin user hiện tại (đã có cookie từ server)
+          await fetchCurrentUser();
+          // Chuyển hướng về trang chủ thay vì ở lại \login
+          navigate('/', { replace: true });
+        } catch (err) {
+          toast.error('Không thể lấy thông tin đăng nhập.');
+        }
+      };
+
+      searchParams.delete('oauth_success');
+      setSearchParams(searchParams, { replace: true });
+      handleOauthSuccess();
     }
-  }, [searchParams, setSearchParams]);
+  }, [searchParams, setSearchParams, fetchCurrentUser, navigate]);
 
   const isLoading = status === 'loading';
 

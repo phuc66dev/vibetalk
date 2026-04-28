@@ -21,9 +21,11 @@ const oauth2Login = async (req, res, next) => {
     // Set access_token cookie (httpOnly, không cần CORS vì đây là server-side redirect)
     await generateAccessToken(res, user._id);
 
+    console.log("Đăng nhập google thành công rồi á!!!")
+
     // Redirect về frontend — browser tự mang cookie theo
     // KHÔNG dùng res.json() vì đây là browser redirect, không phải AJAX
-    res.redirect(`${process.env.FRONTEND_ORIGIN}`);
+    res.redirect(`${process.env.FRONTEND_ORIGIN}/login?oauth_success=true`);
   } catch (err) {
     next(err);
   }
@@ -101,7 +103,7 @@ const login = async (req, res, next) => {
 
 const logout = (req, res, next) => {
   try {
-    res.clearCookie("refreshToken", {
+    res.clearCookie("access_token", {
       httpOnly: true,
       secure: true,
       sameSite: "strict",
