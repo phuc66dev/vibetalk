@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { FaGithub, FaGoogle } from 'react-icons/fa';
+import { Icons } from '../utils/icon';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -96,8 +96,8 @@ function LoginPage() {
 
         {/* Logo + title */}
         <div className="flex flex-col items-center gap-[0.75rem] text-center">
-          <div className="grid h-[4.5rem] w-[4.5rem] place-items-center rounded-full bg-gradient-to-br from-primary to-primary-strong text-[#2c0051] shadow-soft">
-            <span className="text-[2rem] material-symbols-outlined">masks</span>
+          <div className="grid h-[5.5rem] w-[5.5rem] place-items-center rounded-full shadow-soft p-3 overflow-hidden">
+            <img src="/logo.png" alt="Vibetalk" className="w-full h-full object-contain drop-shadow-md" />
           </div>
           <h1 className="text-[clamp(2.4rem,5vw,4rem)] font-extrabold tracking-[-0.04em] text-text">Vibetalk</h1>
           <p className="text-text-muted">Real connection, absolute anonymity.</p>
@@ -165,11 +165,11 @@ function LoginPage() {
           {/* OAuth buttons */}
           <div className="grid grid-cols-2 gap-4">
             <Button onClick={handleLoginWithGoogle} size="lg" type="button" variant="outline" className="hover:bg-primary-strong ">
-              <FaGoogle className="w-5 h-5" />
+              <Icons.FaGoogle className="w-5 h-5" />
               Google
             </Button>
             <Button onClick={handleLoginWithGithub} size="lg" type="button" variant="outline" className="hover:bg-primary-strong ">
-              <FaGithub className="w-5 h-5" />
+              <Icons.FaGithub className="w-5 h-5" />
               Github
             </Button>
           </div>

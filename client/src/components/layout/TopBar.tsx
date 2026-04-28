@@ -1,7 +1,5 @@
 import { Link, NavLink } from "react-router-dom";
-import { FaUser, FaHome, FaRegUser } from 'react-icons/fa';
-import { MdOutlineReport } from "react-icons/md";
-import { IoMdSettings } from "react-icons/io";
+import { Icons } from "@/utils/icon";
 type TopBarProps = {
   backTo?: string;
   chatMode?: boolean;
@@ -31,10 +29,10 @@ function TopBar({
           ) : null}
           <div className="flex items-center gap-[0.9rem]">
             <Link
-              className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-primary-strong text-[#2c0051] shadow-soft"
+              className="inline-flex h-14 w-14 items-center justify-center rounded-2xl shadow-soft p-1.5 overflow-hidden"
               to="/"
             >
-              <span className="material-symbols-outlined">masks</span>
+              <img src="/logo.png" alt="Vibetalk" className="w-full h-full object-contain drop-shadow-sm" />
             </Link>
             <div className="flex flex-col items-start gap-[0.2rem]">
               <span className="hidden text-[0.68rem] font-bold tracking-[0.18em] uppercase text-text-muted min-[768px]:inline">
@@ -63,7 +61,7 @@ function TopBar({
           >
             {/* <span className="material-symbols-outlined">home</span>
             <span>Home</span> */}
-            <FaHome className="w-5 h-5" />
+            <Icons.FaHome className="w-5 h-5" />
             <span>Home</span>
           </NavLink>
           <NavLink
@@ -75,7 +73,7 @@ function TopBar({
             }
             to="/profile"
           >
-            <FaRegUser className="w-4 h-4" />
+            <Icons.FaRegUser className="w-4 h-4" />
             <span>Profile</span>
           </NavLink>
           <NavLink
@@ -87,7 +85,7 @@ function TopBar({
             }
             to="/settings"
           >
-            <IoMdSettings className="w-5 h-5" />
+            <Icons.IoMdSettings className="w-5 h-5" />
             <span>Settings</span>
           </NavLink>
         </nav>
@@ -115,7 +113,7 @@ function TopBar({
             onClick={onOpenReport}
             type="button"
           >
-            <MdOutlineReport className="w-7 h-7" />
+            <Icons.MdOutlineReport className="w-7 h-7" />
           </button>
         </div>
       </div>

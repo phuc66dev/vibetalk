@@ -1,5 +1,6 @@
 import FeatureCard from '../components/ui/FeatureCard';
 import { useAppContext } from '../components/layout/AppLayout';
+import { Icons } from '@/utils/icon';
 
 function HomePage() {
   const app = useAppContext();
@@ -28,6 +29,7 @@ function HomePage() {
             onClick={app.startNewChat}
             type="button"
           >
+            <Icons.FaMessage size={20} />
             Text
           </button>
           <button
@@ -35,6 +37,7 @@ function HomePage() {
             onClick={app.startNewChat}
             type="button"
           >
+            <Icons.IoIosVideocam size={28} />
             Video
           </button>
         </div>
