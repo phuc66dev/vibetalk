@@ -164,11 +164,11 @@ function LoginPage() {
 
           {/* OAuth buttons */}
           <div className="grid grid-cols-2 gap-4">
-            <Button onClick={handleLoginWithGoogle} size="lg" type="button" variant="secondary">
+            <Button onClick={handleLoginWithGoogle} size="lg" type="button" variant="outline" className="hover:bg-primary-strong ">
               <FaGoogle className="w-5 h-5" />
               Google
             </Button>
-            <Button onClick={handleLoginWithGithub} size="lg" type="button" variant="secondary">
+            <Button onClick={handleLoginWithGithub} size="lg" type="button" variant="outline" className="hover:bg-primary-strong ">
               <FaGithub className="w-5 h-5" />
               Github
             </Button>

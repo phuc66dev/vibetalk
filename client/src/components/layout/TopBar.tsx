@@ -1,5 +1,6 @@
 import { Link, NavLink } from "react-router-dom";
-import { FaUser, FaHome } from 'react-icons/fa';
+import { FaUser, FaHome, FaRegUser } from 'react-icons/fa';
+import { MdOutlineReport } from "react-icons/md";
 import { IoMdSettings } from "react-icons/io";
 type TopBarProps = {
   backTo?: string;
@@ -74,7 +75,7 @@ function TopBar({
             }
             to="/profile"
           >
-            <FaUser className="w-5 h-5" />
+            <FaRegUser className="w-4 h-4" />
             <span>Profile</span>
           </NavLink>
           <NavLink
@@ -114,7 +115,7 @@ function TopBar({
             onClick={onOpenReport}
             type="button"
           >
-            <span className="material-symbols-outlined">report</span>
+            <MdOutlineReport className="w-7 h-7" />
           </button>
         </div>
       </div>
