@@ -4,8 +4,21 @@ const UserSchema = require("../models/user.model");
 const AppError = require("../utils/AppError");
 const ERROR_CODE = require("../utils/errorCodes");
 
+const getBearerToken = (authorizationHeader) => {
+  if (!authorizationHeader) {
+    return null;
+  }
+
+  const [scheme, token] = authorizationHeader.split(" ");
+  if (scheme !== "Bearer" || !token) {
+    return null;
+  }
+
+  return token;
+};
+
 const protectRoute = async (req, res, next) => {
-  const token = req.cookies?.access_token;
+  const token = getBearerToken(req.headers.authorization);
 
   if (!token) {
     return next(AppError.template(ERROR_CODE.UNAUTHORIZED));
@@ -43,4 +56,4 @@ const authorize = (...roles) => {
   };
 };
 
-module.exports = { protectRoute, authorize };
+module.exports = { protectRoute, authorize, getBearerToken };

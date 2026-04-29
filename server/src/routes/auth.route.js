@@ -25,6 +25,11 @@ const {
   refreshToken,
 } = require("../controllers/auth.controller");
 
+const frontendOrigin =
+  process.env.NODE_ENV === "production"
+    ? process.env.FRONTEND_ORIGIN_RENDER || process.env.FRONTEND_ORIGIN
+    : process.env.FRONTEND_ORIGIN || process.env.FRONTEND_ORIGIN_RENDER;
+
 /* Route to start OAuth2 authentication */
 // [GET] /api/auth/google
 router.get(
@@ -38,7 +43,7 @@ router.get(
 router.get(
   "/google/callback",
   passport.authenticate("google", {
-    failureRedirect: `${process.env.FRONTEND_ORIGIN}/login?error=oauth_failed`,
+    failureRedirect: `${frontendOrigin}/login?error=oauth_failed`,
     session: false,
   }),
   oauth2Login
@@ -56,7 +61,7 @@ router.get(
 router.get(
   "/github/callback",
   passport.authenticate("github", {
-    failureRedirect: `${process.env.FRONTEND_ORIGIN}/login?error=oauth_failed`,
+    failureRedirect: `${frontendOrigin}/login?error=oauth_failed`,
     session: false,
   }),
   oauth2Login

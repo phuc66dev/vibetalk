@@ -1,9 +1,10 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { toast } from 'sonner';
-import { resetPassword as resetPasswordService, forgotPassword as forgotPasswordService, logout, loginGoogle, login as loginService, register as registerService } from '../services/authService';
+import { clearTokens, setTokens } from '../services/tokenStorage';
+import { resetPassword as resetPasswordService, forgotPassword as forgotPasswordService, logout, login as loginService, register as registerService } from '../services/authService';
 import { getMe } from '../services/userService';
-import type { AuthStatus, LoginRequest, RegisterRequest, User, ResetPasswordRequest } from '../types';
+import type { AuthStatus, AuthTokens, LoginRequest, RegisterRequest, User, ResetPasswordRequest } from '../types';
 
 type AuthSession = {
   alias: string | null;
@@ -11,15 +12,17 @@ type AuthSession = {
 };
 
 type AuthStore = AuthSession & {
+  clearSession: () => void;
   fetchCurrentUser: () => Promise<User>;
   isAuthenticated: boolean;
   loginWithCredentials: (payload: LoginRequest) => Promise<void>;
   registerWithCredentials: (payload: RegisterRequest) => Promise<void>;
   clearAuthError: () => void;
   login: (alias?: string) => void;
-  logout: () => void;
-  forgotPassword: (payload: string) => void;
-  resetPassword: (payload: ResetPasswordRequest) => void;
+  logout: () => Promise<void>;
+  setSessionTokens: (tokens: AuthTokens) => void;
+  forgotPassword: (payload: string) => Promise<void>;
+  resetPassword: (payload: ResetPasswordRequest) => Promise<void>;
   status: AuthStatus;
 };
 
@@ -27,10 +30,18 @@ export const useAuthStore = create<AuthStore>()(
   persist(
     (set) => ({
       alias: null,
-      authError: null,
       currentUser: null,
       isAuthenticated: false,
       clearAuthError: () => set({ status: 'idle' }),
+      clearSession: () => {
+        clearTokens();
+        set({
+          alias: null,
+          currentUser: null,
+          isAuthenticated: false,
+          status: 'idle',
+        });
+      },
       fetchCurrentUser: async () => {
         const currentUser = await getMe();
         set({
@@ -40,15 +51,18 @@ export const useAuthStore = create<AuthStore>()(
         });
         return currentUser;
       },
+      setSessionTokens: (tokens) => {
+        setTokens(tokens);
+      },
       loginWithCredentials: async (payload) => {
         set({ status: 'loading' });
 
         try {
-          await loginService(payload);
-          const currentUser = await getMe();
+          const session = await loginService(payload);
+          setTokens(session);
           set({
-            alias: currentUser?.name,
-            currentUser,
+            alias: session.user.name,
+            currentUser: session.user,
             isAuthenticated: true,
             status: 'authenticated',
           });
@@ -91,40 +105,18 @@ export const useAuthStore = create<AuthStore>()(
           isAuthenticated: true,
           status: 'authenticated',
         }),
-      loginWithGoogle: async () => {
-        set({ status: 'loading' });
-
+      logout: async () => {
         try {
-          await loginGoogle();
-          const currentUser = await getMe();
-          set({
-            alias: currentUser?.name,
-            currentUser,
-            isAuthenticated: true,
-            status: 'authenticated',
-          });
-          toast.success('Đăng nhập thành công!');
-        } catch (error) {
-          const message = error instanceof Error ? error.message : 'Không thể đăng nhập lúc này.';
+          await logout();
+        } finally {
+          clearTokens();
           set({
             alias: null,
             currentUser: null,
             isAuthenticated: false,
-            status: 'error',
+            status: 'idle',
           });
-          toast.error(message);
-          throw error;
         }
-      },
-
-      logout: async () => {
-        set({
-          alias: null,
-          currentUser: null,
-          isAuthenticated: false,
-          status: 'idle',
-        });
-        await logout();
         toast.success('Đăng xuất thành công!');
       },
 

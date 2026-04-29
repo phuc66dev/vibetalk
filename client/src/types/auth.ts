@@ -1,3 +1,5 @@
+import type { User } from './user';
+
 export type AuthStatus = 'idle' | 'loading' | 'authenticated' | 'error';
 
 export type LoginRequest = {
@@ -5,8 +7,13 @@ export type LoginRequest = {
   password: string;
 };
 
-export type LoginResponse = {
-  alias: string | null;
+export type AuthTokens = {
+  accessToken: string;
+  refreshToken: string;
+};
+
+export type AuthResponse = AuthTokens & {
+  user: User;
 };
 
 export type RegisterRequest = {

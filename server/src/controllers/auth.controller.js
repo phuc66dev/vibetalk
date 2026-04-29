@@ -14,18 +14,39 @@ const {
   generateRefreshToken,
 } = require("../utils/generateToken");
 const AppError = require("../utils/AppError");
+const { getBearerToken } = require("../middlewares/auth.middleware");
+
+const getFrontendOrigin = () => {
+  if (process.env.NODE_ENV === "production") {
+    return process.env.FRONTEND_ORIGIN_RENDER || process.env.FRONTEND_ORIGIN;
+  }
+
+  return process.env.FRONTEND_ORIGIN || process.env.FRONTEND_ORIGIN_RENDER;
+};
+
+const buildAuthPayload = (user) => ({
+  accessToken: generateAccessToken(user._id),
+  refreshToken: generateRefreshToken(user._id),
+  user: {
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    avatar: user.avatar,
+  },
+});
 
 const oauth2Login = async (req, res, next) => {
   const user = req.user;
   try {
-    // Set access_token cookie (httpOnly, không cần CORS vì đây là server-side redirect)
-    await generateAccessToken(res, user._id);
+    const { accessToken, refreshToken } = buildAuthPayload(user);
+    const redirectHash = new URLSearchParams({
+      accessToken,
+      refreshToken,
+    }).toString();
 
-    console.log("Đăng nhập github thành công rồi á!!!: ", user)
-
-    // Redirect về frontend — browser tự mang cookie theo
-    // KHÔNG dùng res.json() vì đây là browser redirect, không phải AJAX
-    res.redirect(`${process.env.FRONTEND_ORIGIN}/login?oauth_success=true`);
+    res.redirect(
+      `${getFrontendOrigin()}/login?oauth_success=true#${redirectHash}`,
+    );
   } catch (err) {
     next(err);
   }
@@ -53,11 +74,14 @@ const register = async (req, res, next) => {
     });
 
     if (newUser) {
-      generateRefreshToken(newUser._id, res);
       responseSuccess(
         res,
         "Register successfully",
-        { email: newUser.email },
+        {
+          _id: newUser._id,
+          name: newUser.name,
+          email: newUser.email,
+        },
         201,
       );
     } else {
@@ -85,17 +109,7 @@ const login = async (req, res, next) => {
         }),
       );
 
-    await generateAccessToken(res, user._id);
-    // await generateRefreshToken(user._id, res);
-
-    const data = {
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      avatar: user.avatar
-    };
-
-    responseSuccess(res, "Login successfully", data, 200);
+    responseSuccess(res, "Login successfully", buildAuthPayload(user), 200);
   } catch (error) {
     next(error);
   }
@@ -103,14 +117,7 @@ const login = async (req, res, next) => {
 
 const logout = (req, res, next) => {
   try {
-    res.clearCookie("access_token", {
-      httpOnly: true,
-      secure: true,
-      sameSite: "strict",
-    });
-    res.status(200).json({
-      message: "Logged out successfully.",
-    });
+    responseSuccess(res, "Logged out successfully.", null, 200);
   } catch (error) {
     next(error);
   }
@@ -194,7 +201,7 @@ const forgotPassword = async (req, res, next) => {
     const user = await userService.findByEmail(email);
     if (!user) return next(AppError.template(ERROR_CODE.NOT_FOUND));
 
-    const tokenReset = generateAccessToken(res, user._id);
+    const tokenReset = generateAccessToken(user._id);
 
     await sendResetPasswordEmail(email, tokenReset);
 
@@ -235,25 +242,33 @@ const resetPassword = async (req, res, next) => {
 };
 
 const refreshToken = async (req, res, next) => {
-  const token = req.cookies?.refreshToken;
+  const token = getBearerToken(req.headers.authorization);
+
   try {
     if (!token) return next(AppError.template(ERROR_CODE.UNAUTHORIZED));
-    jwt.verify(token, process.env.JWT_REFRESHTOKEN, async (err, decoded) => {
-      if (err) {
-        return next(AppError.template(ERROR_CODE.FORBIDDEN));
-      }
 
-      const user = await userService
-        .findById(decoded.userId)
-        .select("-password");
-      if (!user) {
-        return next(AppError.template(ERROR_CODE.NOT_FOUND));
-      }
-      const newAccessToken = await generateAccessToken(user._id);
+    const decoded = jwt.verify(token, process.env.JWT_REFRESHTOKEN);
+    const user = await userService.findById(decoded.userId);
+    if (!user) {
+      return next(AppError.template(ERROR_CODE.NOT_FOUND));
+    }
 
-      res.status(200).json({ accessToken: newAccessToken });
-    });
+    responseSuccess(
+      res,
+      "Refresh token successfully.",
+      {
+        accessToken: generateAccessToken(user._id),
+        refreshToken: generateRefreshToken(user._id),
+      },
+      200,
+    );
   } catch (error) {
+    if (error.name === "TokenExpiredError") {
+      return next(new AppError("Token expired", 401, { code: "UNAUTHORIZED" }));
+    }
+    if (error.name === "JsonWebTokenError") {
+      return next(new AppError("Invalid token", 401, { code: "UNAUTHORIZED" }));
+    }
     next(error);
   }
 };

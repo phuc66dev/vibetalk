@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuthStore } from "../stores/authStore";
+import { getOAuthAuthorizeUrl } from "../services/authService";
 
 /* ── Validation schema ─────────────────────────────────────────── */
 const LoginSchema = z.object({
@@ -36,12 +37,31 @@ function LoginPage() {
     (state) => state.loginWithCredentials,
   );
   const fetchCurrentUser = useAuthStore((state) => state.fetchCurrentUser);
+  const clearSession = useAuthStore((state) => state.clearSession);
+  const setSessionTokens = useAuthStore((state) => state.setSessionTokens);
   const status = useAuthStore((state) => state.status);
+
+  function clearOAuthRedirectState() {
+    const nextSearchParams = new URLSearchParams(searchParams);
+    nextSearchParams.delete("error");
+    nextSearchParams.delete("oauth_success");
+    setSearchParams(nextSearchParams, { replace: true });
+
+    const nextSearch = nextSearchParams.toString();
+    window.history.replaceState(
+      null,
+      "",
+      `${window.location.pathname}${nextSearch ? `?${nextSearch}` : ""}`,
+    );
+  }
 
   // Lắng nghe kết quả từ OAuth2 (thành công hoặc thất bại)
   useEffect(() => {
     const error = searchParams.get("error");
     const oauthSuccess = searchParams.get("oauth_success");
+    const hashParams = new URLSearchParams(window.location.hash.slice(1));
+    const accessToken = hashParams.get("accessToken");
+    const refreshToken = hashParams.get("refreshToken");
 
     if (error) {
       if (error === "oauth_failed") {
@@ -49,25 +69,35 @@ function LoginPage() {
       } else {
         toast.error("Có lỗi xảy ra trong quá trình đăng nhập.");
       }
-      searchParams.delete("error");
-      setSearchParams(searchParams, { replace: true });
+      clearOAuthRedirectState();
     } else if (oauthSuccess) {
       const handleOauthSuccess = async () => {
+        if (!accessToken || !refreshToken) {
+          toast.error("Không nhận được token đăng nhập.");
+          return;
+        }
+
         try {
-          // Lấy thông tin user hiện tại (đã có cookie từ server)
+          setSessionTokens({ accessToken, refreshToken });
           await fetchCurrentUser();
-          // Chuyển hướng về trang chủ thay vì ở lại \login
           navigate("/", { replace: true });
         } catch (err) {
+          clearSession();
           toast.error("Không thể lấy thông tin đăng nhập.");
         }
       };
 
-      searchParams.delete("oauth_success");
-      setSearchParams(searchParams, { replace: true });
+      clearOAuthRedirectState();
       handleOauthSuccess();
     }
-  }, [searchParams, setSearchParams, fetchCurrentUser, navigate]);
+  }, [
+    clearSession,
+    fetchCurrentUser,
+    navigate,
+    searchParams,
+    setSearchParams,
+    setSessionTokens,
+  ]);
 
   const isLoading = status === "loading";
 
@@ -91,13 +121,11 @@ function LoginPage() {
     }
   }
 
-  // Redirect trình duyệt trực tiếp — KHÔNG dùng fetch/axios cho OAuth
-  // Google redirect lại server → server set cookie → redirect về /auth/callback
   function handleLoginWithGoogle() {
-    window.location.href = `${import.meta.env.BASE_URL}/auth/google`;
+    window.location.href = getOAuthAuthorizeUrl("google");
   }
   function handleLoginWithGithub() {
-    window.location.href = `${import.meta.env.BASE_URL}/auth/github`;
+    window.location.href = getOAuthAuthorizeUrl("github");
   }
 
   return (
