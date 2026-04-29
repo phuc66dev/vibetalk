@@ -15,12 +15,22 @@ const errorHandler = require("./middlewares/error.middleware");
 const app = express();
 
 // Middleware
-app.use(
-  cors({
-    origin: process.env.FRONTEND_ORIGIN,
-    credentials: true,
-  }),
-);
+if (process.env.NODE_ENV === "development") {
+  app.use(
+    cors({
+      origin: process.env.FRONTEND_ORIGIN,
+      credentials: true,
+    }),
+  );
+} else {
+  app.use(
+    cors({
+      origin: process.env.FRONTEND_ORIGIN_RENDER,
+      credentials: true,
+    }),
+  );
+}
+
 app.use(express.json()); // để parse body JSON
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));

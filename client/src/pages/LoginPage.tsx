@@ -1,20 +1,28 @@
-import { useEffect } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { toast } from 'sonner';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { Icons } from '../utils/icon';
+import { useEffect } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { toast } from "sonner";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Icons } from "../utils/icon";
 
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useAuthStore } from '../stores/authStore';
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useAuthStore } from "../stores/authStore";
 
 /* ── Validation schema ─────────────────────────────────────────── */
 const LoginSchema = z.object({
-  email: z.string().min(1, 'Email is required').email('Invalid email format').max(255, 'Email is too long'),
-  password: z.string().min(1, 'Password is required').min(6, 'Password must be at least 6 characters').max(50, 'Password is too long'),
+  email: z
+    .string()
+    .min(1, "Email is required")
+    .email("Invalid email format")
+    .max(255, "Email is too long"),
+  password: z
+    .string()
+    .min(1, "Password is required")
+    .min(6, "Password must be at least 6 characters")
+    .max(50, "Password is too long"),
 });
 
 type LoginFormValues = z.infer<typeof LoginSchema>;
@@ -24,22 +32,24 @@ function LoginPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const clearAuthError = useAuthStore((state) => state.clearAuthError);
-  const loginWithCredentials = useAuthStore((state) => state.loginWithCredentials);
+  const loginWithCredentials = useAuthStore(
+    (state) => state.loginWithCredentials,
+  );
   const fetchCurrentUser = useAuthStore((state) => state.fetchCurrentUser);
   const status = useAuthStore((state) => state.status);
 
   // Lắng nghe kết quả từ OAuth2 (thành công hoặc thất bại)
   useEffect(() => {
-    const error = searchParams.get('error');
-    const oauthSuccess = searchParams.get('oauth_success');
+    const error = searchParams.get("error");
+    const oauthSuccess = searchParams.get("oauth_success");
 
     if (error) {
-      if (error === 'oauth_failed') {
-        toast.error('Đăng nhập bằng Google thất bại. Vui lòng thử lại.');
+      if (error === "oauth_failed") {
+        toast.error("Đăng nhập bằng Google thất bại. Vui lòng thử lại.");
       } else {
-        toast.error('Có lỗi xảy ra trong quá trình đăng nhập.');
+        toast.error("Có lỗi xảy ra trong quá trình đăng nhập.");
       }
-      searchParams.delete('error');
+      searchParams.delete("error");
       setSearchParams(searchParams, { replace: true });
     } else if (oauthSuccess) {
       const handleOauthSuccess = async () => {
@@ -47,19 +57,19 @@ function LoginPage() {
           // Lấy thông tin user hiện tại (đã có cookie từ server)
           await fetchCurrentUser();
           // Chuyển hướng về trang chủ thay vì ở lại \login
-          navigate('/', { replace: true });
+          navigate("/", { replace: true });
         } catch (err) {
-          toast.error('Không thể lấy thông tin đăng nhập.');
+          toast.error("Không thể lấy thông tin đăng nhập.");
         }
       };
 
-      searchParams.delete('oauth_success');
+      searchParams.delete("oauth_success");
       setSearchParams(searchParams, { replace: true });
       handleOauthSuccess();
     }
   }, [searchParams, setSearchParams, fetchCurrentUser, navigate]);
 
-  const isLoading = status === 'loading';
+  const isLoading = status === "loading";
 
   const {
     register,
@@ -67,7 +77,7 @@ function LoginPage() {
     formState: { errors },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(LoginSchema),
-    defaultValues: { email: '', password: '' },
+    defaultValues: { email: "", password: "" },
   });
 
   // RHF handleSubmit validate xong → gọi onSubmit với data đã validated
@@ -75,7 +85,7 @@ function LoginPage() {
     clearAuthError();
     try {
       await loginWithCredentials(data);
-      navigate('/', { replace: true });
+      navigate("/", { replace: true });
     } catch {
       // lỗi được xử lý trong store (toast)
     }
@@ -84,23 +94,30 @@ function LoginPage() {
   // Redirect trình duyệt trực tiếp — KHÔNG dùng fetch/axios cho OAuth
   // Google redirect lại server → server set cookie → redirect về /auth/callback
   function handleLoginWithGoogle() {
-    window.location.href = 'http://localhost:8000/api/auth/google';
+    window.location.href = `${import.meta.env.BASE_URL}/auth/google`;
   }
   function handleLoginWithGithub() {
-    window.location.href = 'http://localhost:8000/api/auth/github';
+    window.location.href = `${import.meta.env.BASE_URL}/auth/github`;
   }
 
   return (
     <main className="relative z-[1] flex min-h-screen items-center justify-center px-6 py-8">
       <section className="flex w-full max-w-[26rem] flex-col gap-[1.75rem] animate-[page-fade_320ms_ease-out]">
-
         {/* Logo + title */}
         <div className="flex flex-col items-center gap-[0.75rem] text-center">
           <div className="grid h-[5.5rem] w-[5.5rem] place-items-center rounded-full shadow-soft p-3 overflow-hidden">
-            <img src="/logo.png" alt="Vibetalk" className="w-full h-full object-contain drop-shadow-md" />
+            <img
+              src="/logo.png"
+              alt="Vibetalk"
+              className="w-full h-full object-contain drop-shadow-md"
+            />
           </div>
-          <h1 className="text-[clamp(2.4rem,5vw,4rem)] font-extrabold tracking-[-0.04em] text-text">Vibetalk</h1>
-          <p className="text-text-muted">Real connection, absolute anonymity.</p>
+          <h1 className="text-[clamp(2.4rem,5vw,4rem)] font-extrabold tracking-[-0.04em] text-text">
+            Vibetalk
+          </h1>
+          <p className="text-text-muted">
+            Real connection, absolute anonymity.
+          </p>
         </div>
 
         {/* Card */}
@@ -109,13 +126,19 @@ function LoginPage() {
           <div className="absolute inset-x-0 top-0 h-[2px] rounded-full bg-gradient-to-r from-transparent via-primary/45 to-transparent" />
 
           <header className="mb-6 flex flex-col gap-[0.35rem]">
-            <h2 className="text-2xl font-extrabold tracking-[-0.04em] text-text">Welcome back</h2>
-            <p className="text-text-muted">Sign in to rejoin the confessional.</p>
+            <h2 className="text-2xl font-extrabold tracking-[-0.04em] text-text">
+              Welcome back
+            </h2>
+            <p className="text-text-muted">
+              Sign in to rejoin the confessional.
+            </p>
           </header>
 
           {/* handleSubmit(onSubmit) — RHF tự preventDefault và validate */}
-          <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
-
+          <form
+            className="flex flex-col gap-4"
+            onSubmit={handleSubmit(onSubmit)}
+          >
             {/* Email */}
             <div className="flex flex-col gap-[0.55rem]">
               <Label className="uppercase">Email Address</Label>
@@ -124,7 +147,7 @@ function LoginPage() {
                 type="email"
                 placeholder="Type your email address"
                 aria-invalid={!!errors.email}
-                {...register('email')}
+                {...register("email")}
               />
               {errors.email && (
                 <p className="text-xs text-danger">{errors.email?.message}</p>
@@ -139,15 +162,22 @@ function LoginPage() {
                 type="password"
                 placeholder="Type your password"
                 aria-invalid={!!errors.password}
-                {...register('password')}
+                {...register("password")}
               />
               {errors.password && (
-                <p className="text-xs text-danger">{errors.password?.message}</p>
+                <p className="text-xs text-danger">
+                  {errors.password?.message}
+                </p>
               )}
             </div>
 
             <div className="flex flex-col gap-[0.55rem]">
-              <Link to='/forgot-password' className='text-right text-text-muted transition-all hover:text-text'>Forgot password?</Link>
+              <Link
+                to="/forgot-password"
+                className="text-right text-text-muted transition-all hover:text-text"
+              >
+                Forgot password?
+              </Link>
             </div>
 
             <Button
@@ -157,22 +187,36 @@ function LoginPage() {
               type="submit"
               variant="auth"
             >
-              {isLoading ? 'Logging in...' : 'Log In'}
+              {isLoading ? "Logging in..." : "Log In"}
             </Button>
           </form>
 
           {/* Divider */}
           <div className="relative my-6 flex items-center justify-center text-[0.8rem] text-text-muted before:absolute before:inset-x-0 before:top-1/2 before:border-t before:border-outline/22 before:content-['']">
-            <span className="relative z-[1] bg-[#1f1f23]/98 px-3">Or continue with</span>
+            <span className="relative z-[1] bg-[#1f1f23]/98 px-3">
+              Or continue with
+            </span>
           </div>
 
           {/* OAuth buttons */}
           <div className="grid grid-cols-2 gap-4">
-            <Button onClick={handleLoginWithGoogle} size="lg" type="button" variant="outline" className="hover:bg-primary-strong ">
+            <Button
+              onClick={handleLoginWithGoogle}
+              size="lg"
+              type="button"
+              variant="outline"
+              className="hover:bg-primary-strong "
+            >
               <Icons.FaGoogle className="w-5 h-5" />
               Google
             </Button>
-            <Button onClick={handleLoginWithGithub} size="lg" type="button" variant="outline" className="hover:bg-primary-strong ">
+            <Button
+              onClick={handleLoginWithGithub}
+              size="lg"
+              type="button"
+              variant="outline"
+              className="hover:bg-primary-strong "
+            >
               <Icons.FaGithub className="w-5 h-5" />
               Github
             </Button>
@@ -180,7 +224,7 @@ function LoginPage() {
         </div>
 
         <p className="text-center text-[0.95rem] text-text-muted">
-          New to the void?{' '}
+          New to the void?{" "}
           <Link className="font-extrabold text-primary" to="/register">
             Create account
           </Link>
