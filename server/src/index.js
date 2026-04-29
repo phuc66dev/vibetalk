@@ -22,13 +22,6 @@ if (process.env.NODE_ENV === "development") {
       credentials: true,
     }),
   );
-} else {
-  app.use(
-    cors({
-      origin: process.env.FRONTEND_ORIGIN_RENDER,
-      credentials: true,
-    }),
-  );
 }
 
 app.use(express.json()); // để parse body JSON

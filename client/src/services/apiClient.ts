@@ -1,7 +1,8 @@
-import axios, { AxiosError } from 'axios';
+import axios, { AxiosError } from "axios";
 
 // const API_BASE_URL = 'http://localhost:8000/api';
-const API_BASE_URL = import.meta.env.VITE_SERVER_URL;
+const API_BASE_URL =
+  import.meta.env.MODE === "development" ? "http://localhost:8000/api" : "/api";
 
 export class ApiError extends Error {
   status: number;
@@ -9,7 +10,7 @@ export class ApiError extends Error {
 
   constructor(message: string, status: number, data: unknown) {
     super(message);
-    this.name = 'ApiError';
+    this.name = "ApiError";
     this.status = status;
     this.data = data;
   }
@@ -19,8 +20,8 @@ const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true,
   headers: {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json',
+    Accept: "application/json",
+    "Content-Type": "application/json",
   },
 });
 
@@ -31,15 +32,20 @@ axiosInstance.interceptors.response.use(
     const status = error.response?.status ?? 500;
     const data = error.response?.data;
 
-    let message = 'Request failed';
-    if (data && typeof data === 'object' && 'message' in data && typeof data.message === 'string') {
+    let message = "Request failed";
+    if (
+      data &&
+      typeof data === "object" &&
+      "message" in data &&
+      typeof data.message === "string"
+    ) {
       message = data.message;
     } else if (error.message) {
       message = error.message;
     }
 
     throw new ApiError(message, status, data);
-  }
+  },
 );
 
 export const apiClient = {
