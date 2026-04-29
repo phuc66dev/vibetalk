@@ -4,7 +4,7 @@ import { useAppContext } from '../components/layout/AppLayout';
 
 function DisconnectedPage() {
   const app = useAppContext();
-  const { openReportModal, startNewChat } = app;
+  const { startNewChat } = app;
 
   return (
     <main className="relative z-[1] min-h-screen px-6 pb-[7.5rem] pt-[6rem] animate-[page-fade_320ms_ease-out]">
