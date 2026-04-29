@@ -2,7 +2,9 @@ import axios, { AxiosError } from "axios";
 
 // const API_BASE_URL = 'http://localhost:8000/api';
 const API_BASE_URL =
-  import.meta.env.MODE === "development" ? "http://localhost:8000/api" : "/api";
+  import.meta.env.MODE === "development"
+    ? import.meta.env.FRONTEND_ORIGIN
+    : import.meta.env.FRONTEND_ORIGIN_RENDER;
 
 export class ApiError extends Error {
   status: number;
