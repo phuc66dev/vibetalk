@@ -2,8 +2,8 @@ import axios, { AxiosError } from "axios";
 
 const API_BASE_URL =
   import.meta.env.MODE === "development"
-    ? import.meta.env.SERVER_ORIGIN
-    : import.meta.env.SERVER_ORIGIN_RENDER;
+    ? import.meta.env.VITE_SERVER_ORIGIN
+    : import.meta.env.VITE_SERVER_ORIGIN_RENDER);
 
 export class ApiError extends Error {
   status: number;
