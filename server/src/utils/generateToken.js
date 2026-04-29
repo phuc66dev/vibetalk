@@ -5,10 +5,10 @@ const generateAccessToken = (res, userId) => {
     expiresIn: "15m",
   });
 
-  res.cookie('access_token', token, {
+  res.cookie("access_token", token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV !== 'development', // false trên localhost
-    sameSite: 'strict',
+    secure: process.env.NODE_ENV !== "development", // false trên localhost
+    sameSite: "none",
     maxAge: 15 * 60 * 1000, // 15 phút (khớp với expiresIn JWT)
   });
 
@@ -23,7 +23,7 @@ const generateRefreshToken = (userId, res) => {
   res.cookie("refreshToken", freshToken, {
     maxAge: 7 * 24 * 60 * 60 * 1000,
     httpOnly: true,
-    sameSite: "strict",
+    sameSite: "none",
     secure: process.env.NODE_ENV !== "development",
   });
 };

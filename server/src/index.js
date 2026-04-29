@@ -49,7 +49,7 @@ app.use(
     cookie: {
       secure: process.env.NODE_ENV !== "development", // false trên localhost
       httpOnly: true,
-      sameSite: "none", // lax để Google redirect hoạt động (strict chặn redirect)
+      sameSite: "", // lax để Google redirect hoạt động (strict chặn redirect)
       maxAge: 10 * 60 * 1000, // 10 phút (chỉ dùng trong OAuth flow)
     },
   }),
