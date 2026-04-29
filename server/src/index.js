@@ -24,6 +24,8 @@ app.use(
 app.use(express.json()); // để parse body JSON
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
+
+app.set("trust proxy", 1);
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "keyboard cat",
