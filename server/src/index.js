@@ -14,16 +14,28 @@ const errorHandler = require("./middlewares/error.middleware");
 // Khởi tạo ứng dụng Express
 const app = express();
 
-// Middleware
-if (process.env.NODE_ENV === "development") {
-  app.use(
-    cors({
-      origin: process.env.FRONTEND_ORIGIN,
-      credentials: true,
-    }),
-  );
-}
+// Cấu hình danh sách các domain được phép truy cập
+const allowedOrigins = [
+  process.env.FRONTEND_ORIGIN,
+  process.env.FRONTEND_ORIGIN_RENDER, // Production
+];
 
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Cho phép các request không có origin (như Postman hoặc mobile apps)
+      // hoặc origin nằm trong danh sách allowed
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true, // Bắt buộc phải có để gửi/nhận cookie (Session)
+  }),
+);
+
+// Middleware
 app.use(express.json()); // để parse body JSON
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
