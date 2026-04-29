@@ -1,6 +1,7 @@
 import axios, { AxiosError } from 'axios';
 
-const API_BASE_URL = 'http://localhost:8000/api';
+// const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = import.meta.env.VITE_SERVER_URL;
 
 export class ApiError extends Error {
   status: number;
@@ -29,7 +30,7 @@ axiosInstance.interceptors.response.use(
   (error: AxiosError) => {
     const status = error.response?.status ?? 500;
     const data = error.response?.data;
-    
+
     let message = 'Request failed';
     if (data && typeof data === 'object' && 'message' in data && typeof data.message === 'string') {
       message = data.message;
@@ -42,14 +43,14 @@ axiosInstance.interceptors.response.use(
 );
 
 export const apiClient = {
-  get: <T>(path: string, options?: any) => 
+  get: <T>(path: string, options?: any) =>
     axiosInstance.get<T, T>(path, options),
-  post: <T>(path: string, body?: any, options?: any) => 
+  post: <T>(path: string, body?: any, options?: any) =>
     axiosInstance.post<T, T>(path, body, options),
-  put: <T>(path: string, body?: any, options?: any) => 
+  put: <T>(path: string, body?: any, options?: any) =>
     axiosInstance.put<T, T>(path, body, options),
-  patch: <T>(path: string, body?: any, options?: any) => 
+  patch: <T>(path: string, body?: any, options?: any) =>
     axiosInstance.patch<T, T>(path, body, options),
-  delete: <T>(path: string, options?: any) => 
+  delete: <T>(path: string, options?: any) =>
     axiosInstance.delete<T, T>(path, options),
 };
