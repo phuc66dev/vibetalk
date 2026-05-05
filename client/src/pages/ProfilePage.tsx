@@ -9,7 +9,7 @@ function ProfilePage() {
   const { profile } = app;
 
   return (
-    <main className="relative z-[1] min-h-screen px-6 pb-[7.5rem] pt-[6rem] animate-[page-fade_320ms_ease-out]">
+    <main className="relative z-[1] min-h-screen px-6 pb-12 pt-[7.5rem] animate-[page-fade_320ms_ease-out]">
       <section className="mx-auto flex w-full max-w-[70rem] flex-col gap-6">
         <div className="grid gap-4 md:grid-cols-[1.2fr_2fr]">
           <div className="relative flex flex-col items-center justify-center gap-4 rounded-3xl border border-outline bg-[#1f1f23]/88 p-6 text-center shadow-main">

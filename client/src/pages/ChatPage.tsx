@@ -1,17 +1,19 @@
-import { useEffect, useRef, useState } from 'react';
-import TopBar from '../components/layout/TopBar';
-import { useAppContext } from '../components/layout/AppLayout';
+import { useEffect, useRef, useState } from "react";
+import TopBar from "../components/layout/TopBar";
+import { useAppContext } from "../components/layout/AppLayout";
+import { Icons } from "@/utils/icon";
 
 /**
- * ChatPage – layout riêng, KHÔNG dùng TopBar/BottomNav từ AppLayout.
- * Vì chat cần TopBar đặc biệt (chatMode, nút Skip) và không cần BottomNav.
+ * ChatPage – layout riêng, dùng TopBar đặc biệt cho chế độ chat.
+ * AppLayout sẽ không render TopBar mặc định ở route này.
  * AppLayout vẫn cung cấp AuraBackdrop và ReportModal.
  */
 function ChatPage() {
   const app = useAppContext();
-  const { messages, openReportModal, sendMessage, skipChat, strangerTyping } = app;
+  const { messages, openReportModal, sendMessage, skipChat, strangerTyping } =
+    app;
 
-  const [draft, setDraft] = useState('');
+  const [draft, setDraft] = useState("");
   const streamRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -25,23 +27,22 @@ function ChatPage() {
     const next = draft.trim();
     if (!next) return;
     sendMessage(next);
-    setDraft('');
+    setDraft("");
   }
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
-    if (event.key === 'Enter' && !event.shiftKey) {
+    if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
       const next = draft.trim();
       if (next) {
         sendMessage(next);
-        setDraft('');
+        setDraft("");
       }
     }
   }
 
   return (
-    <main className="relative z-[1] flex min-h-screen flex-col px-6 pb-[6rem] pt-[6rem] animate-[page-fade_320ms_ease-out]">
-      {/* TopBar chat mode riêng — override TopBar từ AppLayout */}
+    <main className="relative z-[1] flex min-h-screen flex-col px-6 pb-[6.5rem] pt-[7.5rem] animate-[page-fade_320ms_ease-out]">
       <TopBar chatMode onOpenReport={openReportModal} onSkip={skipChat} />
 
       <section className="mx-auto flex w-full max-w-[70rem] flex-1 flex-col pb-4">
@@ -50,22 +51,26 @@ function ChatPage() {
           ref={streamRef}
         >
           <div className="flex flex-col items-center gap-[0.3rem] pt-4 text-[#a1a1aa]/55">
-            <p className="m-0 uppercase tracking-[0.18em] text-[0.72rem]">Entering the void</p>
-            <span className="text-[0.78rem]">Both participants are anonymous</span>
+            <p className="m-0 uppercase tracking-[0.18em] text-[0.72rem]">
+              Entering the void
+            </p>
+            <span className="text-[0.78rem]">
+              Both participants are anonymous
+            </span>
           </div>
 
           {messages.map((message) => (
             <article
               className={`flex flex-col gap-[0.45rem] max-w-[min(85%,30rem)] ${
-                message.author === 'me' ? 'ml-auto items-end' : 'items-start'
+                message.author === "me" ? "ml-auto items-end" : "items-start"
               }`}
               key={message.id}
             >
               <div
                 className={`p-[0.95rem_1rem] rounded-[1.1rem] leading-[1.6] ${
-                  message.author === 'me'
-                    ? 'text-[#2c0051] bg-gradient-to-br from-primary to-primary-strong rounded-br-[0.35rem]'
-                    : 'bg-surface-highest rounded-bl-[0.35rem]'
+                  message.author === "me"
+                    ? "text-[#2c0051] bg-gradient-to-br from-primary to-primary-strong rounded-br-[0.35rem]"
+                    : "bg-surface-highest rounded-bl-[0.35rem]"
                 }`}
               >
                 {message.text}
@@ -101,7 +106,7 @@ function ChatPage() {
             className="inline-flex h-12 w-12 min-w-[3rem] items-center justify-center gap-2 rounded-2xl bg-gradient-to-br from-primary to-primary-strong font-extrabold text-[#2c0051] transition-all duration-160 hover:-translate-y-px active:scale-[0.98]"
             type="submit"
           >
-            <span className="material-symbols-outlined">send</span>
+            <Icons.LuSendHorizontal strokeWidth={2} size={20} />
           </button>
         </form>
       </section>

@@ -33,4 +33,3 @@ export type ReportState = {
   details: string;
 };
 
-export type BottomNavKey = 'home' | 'profile' | 'settings';

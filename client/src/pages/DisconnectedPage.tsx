@@ -7,8 +7,8 @@ function DisconnectedPage() {
   const { startNewChat } = app;
 
   return (
-    <main className="relative z-[1] min-h-screen px-6 pb-[7.5rem] pt-[6rem] animate-[page-fade_320ms_ease-out]">
-      <section className="mx-auto flex w-full max-w-[70rem] min-h-[calc(100vh-10rem)] flex-col items-center justify-center gap-6 text-center">
+    <main className="relative z-[1] min-h-screen px-6 pb-12 pt-[7.5rem] animate-[page-fade_320ms_ease-out]">
+      <section className="mx-auto flex w-full max-w-[70rem] min-h-[calc(100vh-11rem)] flex-col items-center justify-center gap-6 text-center">
         <div className="mb-4 grid h-24 w-24 place-items-center rounded-full bg-surface-high/66 text-text-muted">
           <span className="material-symbols-outlined text-[2.5rem]">person_off</span>
         </div>

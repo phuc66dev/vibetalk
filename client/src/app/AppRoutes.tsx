@@ -20,7 +20,7 @@ function AppRoutes() {
 
   return (
     <Routes>
-      {/* ── Auth routes: không có TopBar / BottomNav ─────────────────── */}
+      {/* ── Auth routes: không có TopBar ─────────────────────────────── */}
       <Route element={<AuthLayout />}>
         <Route
           path="/login"
@@ -36,7 +36,7 @@ function AppRoutes() {
         />
       </Route>
 
-      {/* ── Protected routes: có TopBar + BottomNav ───────────────────── */}
+      {/* ── Protected routes: có TopBar responsive ───────────────────── */}
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
           <Route path="/" element={<HomePage />} />

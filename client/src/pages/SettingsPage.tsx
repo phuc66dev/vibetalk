@@ -10,7 +10,7 @@ function SettingsPage() {
 
 
   return (
-    <main className="relative z-[1] min-h-screen px-6 pb-[7.5rem] pt-[6rem] animate-[page-fade_320ms_ease-out]">
+    <main className="relative z-[1] min-h-screen px-6 pb-12 pt-[7.5rem] animate-[page-fade_320ms_ease-out]">
       <section className="mx-auto flex w-full max-w-[70rem] flex-col gap-6">
         <header className="flex flex-col gap-[0.35rem]">
           <h2 className="text-2xl font-extrabold tracking-[-0.04em] text-text">Settings</h2>

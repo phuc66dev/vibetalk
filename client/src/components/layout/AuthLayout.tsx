@@ -2,7 +2,7 @@ import { Outlet } from 'react-router-dom';
 import AuraBackdrop from '../ui/AuraBackdrop'
 /**
  * AuthLayout – dùng cho /login và /register.
- * Không có TopBar, BottomNav, chỉ có backdrop + outlet.
+ * Không có TopBar, chỉ có backdrop + outlet.
  */
 function AuthLayout() {
   return (
