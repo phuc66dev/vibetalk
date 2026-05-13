@@ -28,7 +28,7 @@ function HomePage() {
         <div className="flex flex-col md:flex-row gap-4 ">
           <button
             className="inline-flex min-h-[3.5rem] min-w-[15rem] items-center justify-center gap-[0.6rem] rounded-2xl bg-gradient-to-br from-primary to-primary-strong px-[1.2rem] py-[0.95rem] text-[1.05rem] font-extrabold text-[#2c0051] shadow-[0_14px_32px_rgba(127,44,203,0.24)] transition-all duration-160 hover:-translate-y-px active:scale-[0.98] cursor-pointer"
-            onClick={app.startNewChat}
+            onClick={() => void app.startNewChat("text")}
             type="button"
           >
             <Icons.MdOutlineMessage size={20} />
@@ -36,7 +36,7 @@ function HomePage() {
           </button>
           <button
             className="inline-flex min-h-[3.5rem] min-w-[15rem] items-center justify-center gap-[0.6rem] rounded-2xl bg-gradient-to-br from-primary to-primary-strong px-[1.2rem] py-[0.95rem] text-[1.05rem] font-extrabold text-[#2c0051] shadow-[0_14px_32px_rgba(127,44,203,0.24)] transition-all duration-160 hover:-translate-y-px active:scale-[0.98] cursor-pointer"
-            onClick={app.startNewChat}
+            onClick={() => void app.startNewChat("video")}
             type="button"
           >
             <Icons.CiVideoOn strokeWidth={1} size={20} />

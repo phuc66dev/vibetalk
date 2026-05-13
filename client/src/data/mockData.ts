@@ -53,8 +53,14 @@ export const initialBlockedUsers = [
 export function createStarterConversation(): ChatMessage[] {
   return starterMessages.map((text, index) => ({
     author: index === 1 ? "me" : "stranger",
-    id: index + 1,
-    text,
-    time: `11:0${index + 2} PM`,
+    content: text,
+    createdAt: new Date(
+      Date.now() - (starterMessages.length - index) * 60 * 1000,
+    ).toISOString(),
+    id: `mock-${index + 1}`,
+    readAt: null,
+    sessionId: "mock-session",
+    status: index === 1 ? "read" : "delivered",
+    type: "text",
   }));
 }

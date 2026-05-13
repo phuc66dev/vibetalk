@@ -7,6 +7,7 @@ type TopBarProps = {
   chatMode?: boolean;
   onOpenReport: () => void;
   onSkip?: () => void;
+  statusLabel?: string;
   title?: string;
 };
 
@@ -45,6 +46,7 @@ function TopBar({
   chatMode = false,
   onOpenReport,
   onSkip,
+  statusLabel = "Connected",
   title = "Vibetalk",
 }: TopBarProps) {
   const location = useLocation();
@@ -134,7 +136,7 @@ function TopBar({
             {chatMode ? (
               <div className="inline-flex min-h-[2rem] items-center gap-[0.55rem] rounded-full bg-surface-high/88 px-[0.7rem] py-[0.35rem] text-[0.72rem] text-text-muted">
                 <span className="h-[0.55rem] w-[0.55rem] rounded-full bg-success shadow-[0_0_10px_rgba(34,197,94,0.7)]" />
-                <span>Connected</span>
+                <span>{statusLabel}</span>
               </div>
             ) : null}
             {chatMode ? (

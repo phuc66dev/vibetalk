@@ -1,10 +1,12 @@
+import type { ReportReason } from "../../types";
+
 type ReportModalProps = {
   details: string;
   onClose: () => void;
   onDetailsChange: (details: string) => void;
-  onReasonChange: (reason: string) => void;
+  onReasonChange: (reason: ReportReason) => void;
   onSubmit: () => void;
-  reason: string;
+  reason: ReportReason;
 };
 
 function ReportModal({
@@ -40,12 +42,18 @@ function ReportModal({
             <span className="text-[0.72rem] font-bold tracking-[0.16em] uppercase text-text-muted">Select Reason</span>
             <select
               className="w-full min-h-[3.5rem] rounded-2xl border border-transparent bg-surface-lowest px-4 py-[0.9rem] text-text outline-none transition-all duration-200 focus:border-primary/36 focus:shadow-[0_0_0_3px_rgba(221,184,255,0.12)]"
-              onChange={(event) => onReasonChange(event.target.value)}
+              onChange={(event) =>
+                onReasonChange(event.target.value as ReportReason)
+              }
               value={reason}
             >
               <option value="spam">Spam</option>
               <option value="harassment">Harassment</option>
-              <option value="inappropriate">Inappropriate content</option>
+              <option value="hate_speech">Hate speech</option>
+              <option value="nudity">Nudity</option>
+              <option value="violence">Violence</option>
+              <option value="scam">Scam</option>
+              <option value="other">Other</option>
             </select>
           </label>
 

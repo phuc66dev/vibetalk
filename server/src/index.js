@@ -6,6 +6,7 @@ const passport = require("./config/passport");
 const route = require("./routes/index");
 const connectDB = require("./config/db");
 const errorHandler = require("./middlewares/error.middleware");
+const attachSocketServer = require("./socket");
 
 const app = express();
 
@@ -43,6 +44,8 @@ const PORT = process.env.PORT || 5001;
 
 connectDB();
 
-app.listen(PORT, () => {
+const httpServer = attachSocketServer(app);
+
+httpServer.listen(PORT, () => {
   console.log(`Server đang chạy tại http://localhost:${PORT}`);
 });

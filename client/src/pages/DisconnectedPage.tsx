@@ -4,7 +4,7 @@ import { useAppContext } from '../components/layout/AppLayout';
 
 function DisconnectedPage() {
   const app = useAppContext();
-  const { startNewChat } = app;
+  const { disconnectedReason, startNewChat } = app;
 
   return (
     <main className="relative z-[1] min-h-screen px-6 pb-12 pt-[7.5rem] animate-[page-fade_320ms_ease-out]">
@@ -16,14 +16,15 @@ function DisconnectedPage() {
         <div className="flex max-w-[22rem] flex-col items-center gap-4">
           <h1 className="text-[clamp(2.4rem,5vw,4rem)] font-extrabold tracking-[-0.04em]">Vibetalk has disconnected</h1>
           <p className="text-text-muted">
-            The conversation has dissolved back into the void. Ready for a new connection?
+            {disconnectedReason ??
+              "The conversation has dissolved back into the void. Ready for a new connection?"}
           </p>
         </div>
 
         <div className="flex w-full max-w-[20rem] flex-col gap-4">
           <button
             className="inline-flex min-h-[3.5rem] items-center justify-center gap-[0.6rem] rounded-2xl bg-gradient-to-br from-primary to-primary-strong px-[1.2rem] py-[0.95rem] font-extrabold text-[#2c0051] shadow-[0_14px_32px_rgba(127,44,203,0.24)] transition-all duration-160 hover:-translate-y-px active:scale-[0.98]"
-            onClick={startNewChat}
+            onClick={() => void startNewChat("text")}
             type="button"
           >
             Find new chat
